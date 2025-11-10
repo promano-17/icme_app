@@ -4,7 +4,7 @@ ICME app, in development
 
 ## About
 
-This is a Streamlit application for ICME (Industrial and Commercial Management Engineering).
+This is a Streamlit application for learning how to detect CMEs from spacecraft data.
 
 ## Installation
 
