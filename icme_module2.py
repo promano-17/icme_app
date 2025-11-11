@@ -9,14 +9,14 @@ from plotly.subplots import make_subplots
 import joblib
 import pickle
 from sklearn.preprocessing import RobustScaler
-from general_code_and_catalogs.LASSOS_Py.data.wind2 import read_wind_mag
-from general_code_and_catalogs.LASSOS_Py.data.wind2 import read_wind_ion
-from general_code_and_catalogs.LASSOS_Py.data.psp2 import read_psp_mag
-from general_code_and_catalogs.LASSOS_Py.data.psp2 import read_psp_ion
-from general_code_and_catalogs.LASSOS_Py.data.solo2 import read_solo_mag
-from general_code_and_catalogs.LASSOS_Py.data.solo2 import read_solo_ion
-from general_code_and_catalogs.LASSOS_Py.data.stereo2 import read_stereo_mag
-from general_code_and_catalogs.LASSOS_Py.data.stereo2 import read_stereo_ion
+from wind2 import read_wind_mag
+from wind2 import read_wind_ion
+from psp2 import read_psp_mag
+from psp2 import read_psp_ion
+from solo2 import read_solo_mag
+from solo2 import read_solo_ion
+from stereo2 import read_stereo_mag
+from stereo2 import read_stereo_ion
 
 # Physical constants
 mu_0 = 4 * np.pi * 1e-7    # N/A²
