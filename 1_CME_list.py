@@ -72,7 +72,7 @@ if st.session_state.page == "1_CME_List":
         st.session_state["selected_rows"] = cme_list
         st.success(f"""✅ {len(cme_list)} CME(s) selected and saved to session. Continue to the "📈 Let's find it" page""")
     else:
-        st.info("Select CME rows to use in ICME App")
+        st.info("Select CME rows to copy to next page.")
  
 
 
