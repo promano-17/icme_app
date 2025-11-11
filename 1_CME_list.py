@@ -5,8 +5,8 @@ from datetime import datetime
 
 st.session_state.page = "1_CME_List"
 
-cme_data_2024 = pd.read_csv('/Users/peromano/Documents/CS_project/cme_data_filtered2024-01-01_2024-12-31.csv')
-cme_data_2025 = pd.read_csv('/Users/peromano/Documents/CS_project/cme_data_filtered2025-01-01_2025-09-15.csv')
+cme_data_2024 = pd.read_csv('cme_data_filtered2024-01-01_2024-12-31.csv')
+cme_data_2025 = pd.read_csv('cme_data_filtered2025-01-01_2025-09-15.csv')
 #add the data from 9-15 to launch of app date or other end date 
 df = pd.concat([cme_data_2024, cme_data_2025], axis = 0)
 
