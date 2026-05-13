@@ -135,9 +135,9 @@ def read_stereo_mag(start, end, spacecraft, cache_dir='./cdas-data'):
 ##reassigned RTN to XYZ
     map_names = {'date_time':data['EPOCH'],
             'R':data['R_RTN'],   # AU
-            'Bx':data['BX(RTN)'],
-            'By':data['BY(RTN)'],
-            'Bz':data['BZ(RTN)'],
+            'Br':data['BR'],
+            'Bt':data['BT'],
+            'Bn':data['BN'],
             'B':data['BTOTAL'],
             }
     df = pd.DataFrame(data=map_names)
@@ -153,9 +153,9 @@ def read_stereo_mag(start, end, spacecraft, cache_dir='./cdas-data'):
     df.attrs['data_source'] = f'STEREO MAG/IMPACT dataset [{dataset}]'
     df.attrs['timezone'] = 'UTC'    
     df.R.attrs['unit'] = 'AU'
-    df.Bx.attrs['unit'] = 'nT'
-    df.By.attrs['unit'] = 'nT'
-    df.Bz.attrs['unit'] = 'nT'
+    df.Br.attrs['unit'] = 'nT'
+    df.Bt.attrs['unit'] = 'nT'
+    df.Bn.attrs['unit'] = 'nT'
     df.B.attrs['unit'] = 'nT'
 
     units = {}

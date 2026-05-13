@@ -1,0 +1,62 @@
+Metadata-Version: 2.1
+Name: cdflib
+Version: 1.2.6
+Summary: A python CDF reader toolkit
+Home-page: https://github.com/MAVENSDC/cdflib
+Author: MAVEN SDC
+Author-email: mavensdc@lasp.colorado.edu
+Keywords: CDF,maven,lasp,PDS,GSFC
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Science/Research
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Topic :: Utilities
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Provides-Extra: docs
+Requires-Dist: astropy ; extra == 'docs'
+Requires-Dist: xarray ; extra == 'docs'
+Requires-Dist: sphinx ; extra == 'docs'
+Requires-Dist: sphinx-automodapi ; extra == 'docs'
+Requires-Dist: sphinx-copybutton ; extra == 'docs'
+Requires-Dist: sphinx-rtd-theme ; extra == 'docs'
+Provides-Extra: tests
+Requires-Dist: astropy ; extra == 'tests'
+Requires-Dist: hypothesis ; extra == 'tests'
+Requires-Dist: pytest >=3.9 ; extra == 'tests'
+Requires-Dist: pytest-cov ; extra == 'tests'
+Requires-Dist: pytest-remotedata ; extra == 'tests'
+Requires-Dist: xarray ; extra == 'tests'
+
+[![Run tests](https://github.com/MAVENSDC/cdflib/actions/workflows/ci.yml/badge.svg)](https://github.com/MAVENSDC/cdflib/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/MAVENSDC/cdflib/branch/master/graph/badge.svg?token=IJ6moGc40e)](https://codecov.io/gh/MAVENSDC/cdflib)
+[![DOI](https://zenodo.org/badge/102912691.svg)](https://zenodo.org/badge/latestdoi/102912691)
+[![Documentation Status](https://readthedocs.org/projects/cdflib/badge/?version=latest)](https://cdflib.readthedocs.io/en/latest/?badge=latest)
+
+# CDFlib
+
+`cdflib` is a python module to read/write CDF (Common Data Format `.cdf`) files without needing to install the
+[CDF NASA library](https://cdf.gsfc.nasa.gov/).
+
+Python >= 3.8 is required.
+The core of this package uses only numpy, with no complicated compiler requirements.
+
+## Install
+
+To install, open up your terminal/command prompt, and type:
+```sh
+pip install cdflib
+```
+
+## Documentation
+
+The full documentation can be found here:
+
+[https://cdflib.readthedocs.io/en/latest/](https://cdflib.readthedocs.io/en/latest/)

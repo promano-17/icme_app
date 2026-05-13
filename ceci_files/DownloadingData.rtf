@@ -1,0 +1,147 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 from cdasws import CdasWs\
+cdas = CdasWs()\
+\
+#binData = \{'interval': 900.0,'interpolateMissingValues': False,'sigmaMultiplier': 4\}\
+status1, SOLO_MFIdata = cdas.get_data('SOLO_L2_MAG-RTN-NORMAL-1-MINUTE', ['B_RTN'],\
+                      '2024-10-26T06:00:00Z', '2024-10-30T00:00:00Z')#,binData=binData) #'2023-04-21T18:00:00Z', '2023-04-27T18:00:00Z')#'WI_K1-RTN_MFI', ['BF1', 'BRTN'],\
+\
+if SOLO_MFIdata is None:\
+    print("Error: No data returned from cdas.get_data.")\
+else:\
+    SOLO_MFI = pd.DataFrame(\{\
+        'Epoch': SOLO_MFIdata['EPOCH'],\
+#        'Epoch': np.arange(len(SOLO_MFIdata['B_RTN'][:,0])),\
+        'B_R': SOLO_MFIdata['B_RTN'][:,0],\
+        'B_T': SOLO_MFIdata['B_RTN'][:,1],\
+        'B_N': SOLO_MFIdata['B_RTN'][:,2]\
+    \})\
+\
+#'B_N': WIND_MFIdata['BRTN'][:,2]\
+\
+\
+#binData = \{'interval': 900.0,'interpolateMissingValues': False,'sigmaMultiplier': 4\}\
+status2, SOLO_PLAdata = cdas.get_data('SOLO_L2_SWA-PAS-GRND-MOM', ['V_RTN','N', 'T'], #T in eV\
+                      '2024-10-26T06:00:00Z', '2024-10-30T00:00:00Z')#,binData=binData) #'2023-04-21T18:00:00Z', '2023-04-27T18:00:00Z')\
+\
+# Create DataFrame\
+if SOLO_PLAdata is None:\
+    print("Error: No data returned from cdas.get_data.")\
+else:\
+    SOLO_PLA = pd.DataFrame(\{\
+        'Epoch': SOLO_PLAdata['Epoch'],\
+#        'Epoch': np.arange(len(SOLO_PLAdata['N'])),\
+        'N' : SOLO_PLAdata['N'],\
+        'T' : SOLO_PLAdata['T'],\
+        'V_R' : SOLO_PLAdata['V_RTN'][:,0],\
+        'V_T' : SOLO_PLAdata['V_RTN'][:,1],\
+        'V_N' : SOLO_PLAdata['V_RTN'][:,2]\
+    \})\
+\
+SOLO_MFI['B'] = np.sqrt(SOLO_MFI['B_R']**2 + SOLO_MFI['B_T']**2 + SOLO_MFI['B_N']**2)\
+SOLO_PLA['V'] = np.sqrt(SOLO_PLA['V_R']**2 + SOLO_PLA['V_T']**2 + SOLO_PLA['V_N']**2)\
+\
+\
+\
+\
+from cdasws import CdasWs\
+cdas = CdasWs()\
+#status, sta_data = cdas.get_data('STA_COHO1HR_MERGED_MAG_PLASMA', ['BR','BT','BN','plasmaDensity','plasmaTemp','plasmaSpeed'],\
+#                     '2023-04-21T18:00:00Z', '2023-04-27T18:00:00Z')\
+\
+status, sta_data = cdas.get_data('STA_L2_MAGPLASMA_1M', ['BFIELDRTN','Np','Vth','Vp'],\
+                     '2023-04-23T00:00:00Z', '2023-04-26T00:00:00Z') #'2023-04-21T18:00:00Z', '2023-04-27T18:00:00Z')\
+\
+FILLVAL = np.float32(-1e+31)\
+# Create DataFrame\
+sta = pd.DataFrame(\{\
+    'Epoch': sta_data['Epoch'],\
+    'B_R': sta_data['BFIELDRTN'][:,0],\
+    'B_T': sta_data['BFIELDRTN'][:,1],\
+    'B_N': sta_data['BFIELDRTN'][:,2],\
+    'N' : sta_data['Np'],\
+    'T' : sta_data['Vth'],\
+    'V' : sta_data['Vp']\
+\})\
+ \
+# Replace FILLVAL with NaN and drop those rows\
+sta.replace(FILLVAL, np.nan, inplace=True)\
+sta.dropna(subset=['B_R', 'B_T', 'B_N', 'N', 'T', 'V'], inplace=True)\
+\
+sta['B'] = np.sqrt(sta['B_R']**2 + sta['B_T']**2 + sta['B_N']**2)\
+\
+#Compute and store Beta_proton\
+kBz = np.float64(1.3806503e-23)        # Boltzmann constant (kg*m^2)/(K*s^2)\
+mu0 = np.float64(4.0 * np.pi * 1e-7)   # Permeability of  free space (H/m) = (N/A^2) = (kg*m/s^2)/A^2; A = kg/(T*s^2)\
+\
+Pplasma_sta = 1e6*sta['N'] * kBz * sta['T']         # Plasma pressure (kg/(m*s^2)) a.k.a. (Pa); (need Np in m^-3 not cm^-3; T in K) [Thermal Pressure?]\
+Pmag_sta = (sta['B'] * 1e-9)**2 / (2.0 * mu0)     # Magnetic pressure (kg/(m*s^2)) (need B in T not nT)\
+ibt = (Pplasma_sta != 0) & (Pmag_sta != 0)  \
+\
+betaplm_sta = np.zeros_like(Pplasma_sta)\
+betaplm_sta[ibt] = Pplasma_sta[ibt]/Pmag_sta[ibt]\
+sta['Beta_p'] = betaplm_sta\
+\
+\
+status1, WIND_MFIdata = cdas.get_data('WI_H1_SWE_RTN', ['BR', 'BT', 'BN'],\
+                      '2023-04-23T00:00:00Z', '2023-04-26T00:00:00Z') #'2023-04-21T18:00:00Z', '2023-04-27T18:00:00Z')#'WI_K1-RTN_MFI', ['BF1', 'BRTN'],\
+\
+if WIND_MFIdata is None:\
+    print("Error: No data returned from cdas.get_data.")\
+else:\
+    WIND_MFI = pd.DataFrame(\{\
+        'Epoch': WIND_MFIdata['Epoch'],\
+        'B_R': WIND_MFIdata['BR'],\
+        'B_T': WIND_MFIdata['BT'],\
+        'B_N': WIND_MFIdata['BN']\
+    \})\
+\
+#'B_N': WIND_MFIdata['BRTN'][:,2]\
+\
+status2, WIND_PLAdata = cdas.get_data('WI_H1_SWE_RTN', ['Proton_V_moment','Proton_Np_moment', 'Proton_W_moment'],\
+                      '2023-04-23T00:00:00Z', '2023-04-26T00:00:00Z') #'2023-04-21T18:00:00Z', '2023-04-27T18:00:00Z')\
+\
+# Create DataFrame\
+if WIND_PLAdata is None:\
+    print("Error: No data returned from cdas.get_data.")\
+else:\
+    WIND_PLA = pd.DataFrame(\{\
+        'Epoch': WIND_PLAdata['Epoch'],\
+        'N' : WIND_PLAdata['Proton_Np_moment'],\
+        'T' : WIND_PLAdata['Proton_W_moment'],\
+        'V' : WIND_PLAdata['Proton_V_moment']\
+    \})\
+\
+WIND_MFI['B'] = np.sqrt(WIND_MFI['B_R']**2 + WIND_MFI['B_T']**2 + WIND_MFI['B_N']**2)\
+\
+\
+\
+from cdasws import CdasWs\
+cdas = CdasWs()\
+\
+binData = \{'interval': 600.0,'interpolateMissingValues': True,'sigmaMultiplier': 4\}\
+status1, PSP_data = cdas.get_data('PSP_COHO1HR_MERGED_MAG_PLASMA', ['BR', 'BT', 'BN', 'B', 'VR', 'VT', 'VN', 'protonSpeed','protonDensity', 'protonTemp'],\
+                      '2024-10-26T06:00:00Z', '2024-11-01T12:00:00Z',binData=binData) #'2023-04-21T18:00:00Z', '2023-04-27T18:00:00Z')#'WI_K1-RTN_MFI', ['BF1', 'BRTN'],\
+\
+\
+#status1, PSP_MFIdata = cdas.get_data('PSP_FLD_L2_MAG_RTN_1MIN', ['B_R', 'B_T', 'B_N'],\
+#                      '2024-10-26T06:00:00Z', '2024-11-01T12:00:00Z') #'2023-04-21T18:00:00Z', '2023-04-27T18:00:00Z')#'WI_K1-RTN_MFI', ['BF1', 'BRTN'],\
+\
+if PSP_data is None:\
+    print("Error: No data returned from cdas.get_data.")\
+else:\
+    PSP = pd.DataFrame(\{\
+        'Epoch': PSP_data['EPOCH'],\
+        'B_R': PSP_data['B_R'],\
+        'B_T': PSP_data['B_T'],\
+        'B_N': PSP_data['B_N'],\
+        'N' : PSP_data['protonDensity'],\
+        'T' : PSP_data['protonTemp'],\
+        'V' : PSP_data['protonSpeed']\
+    \})}
