@@ -1,3 +1,5 @@
+setuptools>=70
+wheel
 ai.cdas==1.2.3
 altair==5.5.0
 astropy==6.0.0
